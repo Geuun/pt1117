@@ -50,26 +50,5 @@ class UserRestControllerTest {
 
         verify(userServise).getUserResponse(id);
     }
-
-    @Test
-    @DisplayName("POST addUserRequest: 유저 추가 POST API TEST")
-    void addUserRequest() throws Exception {
-        Long id = 1l;
-        UserRequest userRequest = new UserRequest("test", "");
-        UserResponse userResponse = new UserResponse(1l, userRequest.getUsername(), "");
-
-        given(userServise.addUserRequest(any()))
-                .willReturn(userResponse);
-
-        mockMvc.perform(post("/api/v1/users/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(userRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.username").exists())
-                .andExpect(jsonPath("$.password").exists())
-                .andDo(print());
-
-        verify(userServise).addUserRequest(userRequest);
-    }
+    
 }
