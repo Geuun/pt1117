@@ -28,5 +28,14 @@ public class UserServise {
         }
     }
 
-
+    public UserResponse addUserRequest(UserRequest userRequest) {
+        List<User> userList = userRepository.findByUsername(userRequest.getUsername());
+        if (!userList.isEmpty()) {
+            return new UserResponse(null , userRequest.getUsername(), "해당 UserName은 이미 존재합니다.");
+        } else {
+            User user = userRequest.toEntity();
+            User savedUser = userRepository.save(user);
+            return new UserResponse(savedUser.getId(), savedUser.getUsername(), "유저가 추가되었습니다.");
+        }
+    }
 }

@@ -28,4 +28,10 @@ public class UserRestController {
                 .body(userResponse);
     }
 
+    @PostMapping("{id}")
+    public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest userRequest) {
+        return  ResponseEntity
+                .ok()
+                .body(userServise.addUserRequest(userRequest));
+    }
 }
