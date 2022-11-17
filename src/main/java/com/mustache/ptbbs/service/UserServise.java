@@ -6,7 +6,6 @@ import com.mustache.ptbbs.domain.user.entity.User;
 import com.mustache.ptbbs.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,13 +28,15 @@ public class UserServise {
     }
 
     public UserResponse addUserRequest(UserRequest userRequest) {
-        List<User> userList = userRepository.findByUsername(userRequest.getUsername());
-        if (!userList.isEmpty()) {
-            return new UserResponse(null , userRequest.getUsername(), "해당 UserName은 이미 존재합니다.");
-        } else {
-            User user = userRequest.toEntity();
+        User user = userRequest.toEntity(); // Req -> Entity
+
+        // 중복 이름이 있는지 찾는 로직
+        Optional<User> optUser =  userRepository.findByUsername(userRequest.getUsername());
+        if (optUser.isEmpty()) {
             User savedUser = userRepository.save(user);
             return new UserResponse(savedUser.getId(), savedUser.getUsername(), "유저가 추가되었습니다.");
+        } else {
+            return new UserResponse(null , userRequest.getUsername(), "해당 UserName은 이미 존재합니다.");
         }
     }
 }
