@@ -2,8 +2,7 @@ package com.mustache.ptbbs.controller;
 
 import com.mustache.ptbbs.domain.user.dto.UserRequest;
 import com.mustache.ptbbs.domain.user.dto.UserResponse;
-import com.mustache.ptbbs.domain.user.entity.User;
-import com.mustache.ptbbs.service.UserServise;
+import com.mustache.ptbbs.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +12,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/users")
 public class UserRestController {
 
-    private final UserServise userServise;
+    private final UserService userService;
 
-    public UserRestController(UserServise userServise) {
-        this.userServise = userServise;
+    public UserRestController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
-        UserResponse userResponse = userServise.getUserResponse(id);
+        UserResponse userResponse = userService.getUserResponse(id);
         log.info(userResponse.toString());
         return ResponseEntity
                 .ok()
@@ -32,6 +31,6 @@ public class UserRestController {
     public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest userRequest) {
         return  ResponseEntity
                 .ok()
-                .body(userServise.addUserRequest(userRequest));
+                .body(userService.addUserRequest(userRequest));
     }
 }

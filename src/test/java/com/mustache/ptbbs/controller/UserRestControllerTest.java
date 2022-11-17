@@ -3,7 +3,7 @@ package com.mustache.ptbbs.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mustache.ptbbs.domain.user.dto.UserRequest;
 import com.mustache.ptbbs.domain.user.dto.UserResponse;
-import com.mustache.ptbbs.service.UserServise;
+import com.mustache.ptbbs.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -22,24 +21,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserRestController.class)
+@WebMvcTest(UserRestController.class) // 특정 클래스 테스트 가능하게
 class UserRestControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    MockMvc mockMvc; // MVC 동작을 배포 전에 테스트할 수 있게 해줌
 
     @Autowired
-    ObjectMapper objectMapper;
+    ObjectMapper objectMapper; // Json 직렬화 & 역직렬화 를 위해 사용
 
     @MockBean
-    UserServise userServise;
+    UserService userService; // 가짜 객체 생성
 
     @Test
     @DisplayName("GET getUserResponse: 아이디로 유저 조회 GET API Test")
     void getUserResponse() throws Exception {
         Long id = 1l;
 
-        given(userServise.getUserResponse(id))
+        given(userService.getUserResponse(id))
                 .willReturn(new UserResponse(1l, "geun", "조회 성공"));
 
         mockMvc.perform(get("/api/v1/users/1"))
@@ -54,7 +53,7 @@ class UserRestControllerTest {
     @Test
     @DisplayName("getUserResponse 조회 실패 테스트")
     void getUserResponseFail() throws Exception {
-        given(userServise.getUserResponse(2l))
+        given(userService.getUserResponse(2l))
                 .willReturn(new UserResponse(null, "", "해당 id의 유저가 없습니다."));
 
         mockMvc.perform(get("/api/v1/users/2"))
@@ -71,7 +70,7 @@ class UserRestControllerTest {
         UserRequest userRequest = new UserRequest("test", "");
         UserResponse userResponse = new UserResponse(1l, userRequest.getUsername(), "회원 등록 성공");
 
-        given(userServise.addUserRequest(any()))
+        given(userService.addUserRequest(any()))
                 .willReturn(userResponse);
 
         mockMvc.perform(post("/api/v1/users/1")
@@ -82,6 +81,6 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$.username").exists())
                 .andDo(print());
 
-        verify(userServise).addUserRequest(userRequest);
+        verify(userService).addUserRequest(userRequest);
     }
 }
