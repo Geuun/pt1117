@@ -1,5 +1,7 @@
 package com.mustache.ptbbs.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mustache.ptbbs.domain.user.dto.UserRequest;
 import com.mustache.ptbbs.domain.user.dto.UserResponse;
 import com.mustache.ptbbs.service.UserServise;
 import org.junit.jupiter.api.DisplayName;
@@ -7,12 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -22,6 +27,9 @@ class UserRestControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @MockBean
     UserServise userServise;
@@ -41,5 +49,27 @@ class UserRestControllerTest {
                 .andDo(print());
 
         verify(userServise).getUserResponse(id);
+    }
+
+    @Test
+    @DisplayName("POST addUserRequest: 유저 추가 POST API TEST")
+    void addUserRequest() throws Exception {
+        Long id = 1l;
+        UserRequest userRequest = new UserRequest("test", "");
+        UserResponse userResponse = new UserResponse(1l, userRequest.getUsername(), "");
+
+        given(userServise.addUserRequest(any()))
+                .willReturn(userResponse);
+
+        mockMvc.perform(post("/api/v1/users/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(userRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.username").exists())
+                .andExpect(jsonPath("$.password").exists())
+                .andDo(print());
+
+        verify(userServise).addUserRequest(userRequest);
     }
 }
